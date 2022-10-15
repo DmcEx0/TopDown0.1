@@ -13,23 +13,26 @@ public class Player : MonoBehaviour, IDamageble
 
     private PlayerBehaviour _playerBehaviour;
     private int _currentHealth;
-    private List<Enemy> _targets = new List<Enemy>();
     private Enemy _target;
+    private List<Enemy> _targets = new List<Enemy>();
     private Collider[] _targetBuffer = new Collider[20];
 
     public Enemy Target => _target;
 
-    public event UnityAction<int> ChangeMoney;
+    public event UnityAction<int> MoneyChanged;
+    public event UnityAction<int, int> HealthChanged;
 
     public void ApplyDamage(int value)
     {
         if (value >= 0)
         {
             _currentHealth -= value;
+            HealthChanged?.Invoke(_currentHealth, _health);
 
             if (_currentHealth <= 0)
             {
-                gameObject.SetActive(false);
+                Debug.Log("Player DIE");
+                Destroy(gameObject);
             }
         }
         else
@@ -39,12 +42,13 @@ public class Player : MonoBehaviour, IDamageble
     public void AddMoney(int money)
     {
         _money += money;
-        ChangeMoney?.Invoke(_money);
+        MoneyChanged?.Invoke(_money);
     }
 
     private void Start()
     {
         _playerBehaviour = GetComponent<PlayerBehaviour>();
+        _currentHealth = _health;
     }
 
     private void Update()
@@ -73,13 +77,11 @@ public class Player : MonoBehaviour, IDamageble
             Vector3 direction = _target.transform.position - transform.position;
             Quaternion rotation = Quaternion.LookRotation(direction);
             transform.rotation = Quaternion.Lerp(transform.rotation, rotation, _rotationSpeed * Time.deltaTime);
-            //_playerBehaviour.StartDoShootCoroutine(_target);
+
+            _playerBehaviour.Shoot(_target);
         }
         else
-        {
             _target = null;
-            //_playerBehaviour.StopDoShootCoroutine();
-        }
     }
 
     private void OnDrawGizmosSelected()

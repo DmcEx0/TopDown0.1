@@ -48,6 +48,7 @@ public class AttackState : State
             EnemyBehaviuor.Shoot();
             yield return delay;
         }
+
         yield break;
     }
 }

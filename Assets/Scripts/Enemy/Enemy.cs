@@ -7,7 +7,6 @@ public class Enemy : MonoBehaviour, IDamageble
 {
     [SerializeField] private int _startHealth;
     [SerializeField] private int _reward;
-    [SerializeField] private int _damage;
 
     private Player _target;
     private float _currentHealth;
@@ -30,6 +29,8 @@ public class Enemy : MonoBehaviour, IDamageble
 
             if (_currentHealth <= 0)
             {
+                Debug.Log("Enemy DIE");
+
                 Dying?.Invoke(this);
                 gameObject.SetActive(false);
                 SetDefaultState();

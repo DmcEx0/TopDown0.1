@@ -10,6 +10,9 @@ public class CameraMove : MonoBehaviour
 
     private void LateUpdate()
     {
+        if (_player == null)
+            return;
+
         Vector3 positionToGo = _player.transform.position + _distanceFromObject;
         Vector3 smoothPosition = Vector3.Lerp(transform.position, positionToGo, _speed);
         transform.position = smoothPosition;

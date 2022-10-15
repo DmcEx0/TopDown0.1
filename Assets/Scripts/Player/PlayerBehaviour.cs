@@ -7,20 +7,23 @@ public class PlayerBehaviour : ObjectPool
     [SerializeField] private float _speed;
     [SerializeField] private Transform _shootPoint;
     [SerializeField] private Bullet _bulletTemplate;
+    [SerializeField] private float _delay;
 
     private PlayerController _playerController;
     private Rigidbody _rb;
-    private Coroutine _doShootJob;
+    private float _timeAfterShot;
 
-    public void StartDoShootCoroutine(Enemy target)
+    public void Shoot(Enemy target)
     {
-        _doShootJob = StartCoroutine(DoShoot(target));
-    }
+        _timeAfterShot += Time.deltaTime;
 
-    public void StopDoShootCoroutine()
-    {
-        if (_doShootJob != null)
-            StopCoroutine(_doShootJob);
+        if (_timeAfterShot >= _delay)
+        {
+            if (TryGetObject(out GameObject bullet))
+                SetBullet(bullet, target);
+
+            _timeAfterShot = 0;
+        }
     }
 
     private void Start()
@@ -49,23 +52,6 @@ public class PlayerBehaviour : ObjectPool
         _rb.MovePosition(_rb.position + moveDirection * scaleMoveSpeed);
     }
 
-    private IEnumerator DoShoot(Enemy target)
-    {
-        WaitForSeconds delay = new WaitForSeconds(1);
-
-        while (target != null)
-        {
-            Shoot(target);
-
-            yield return delay;
-        }
-    }
-
-    private void Shoot(Enemy target)
-    {
-        if (TryGetObject(out GameObject bullet))
-            SetBullet(bullet, target);
-    }
 
     private void SetBullet(GameObject bulletTemplate, Enemy target)
     {
