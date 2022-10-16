@@ -32,6 +32,13 @@ public class AttackState : State
 
         if (hits <= 0)
             StateMachine.ChangeState(EnemyBehaviuor.FollowState);
+
+        if (EnemyBehaviuor.Target != null)
+        {
+            Vector3 direction = EnemyBehaviuor.Target.transform.position - EnemyBehaviuor.transform.position;
+            Quaternion rotation = Quaternion.LookRotation(direction);
+            EnemyBehaviuor.transform.rotation = Quaternion.Lerp(EnemyBehaviuor.transform.rotation, rotation, EnemyBehaviuor.RotationSpeed * Time.fixedDeltaTime);
+        }
     }
 
     public override void PhysicsUpdate()

@@ -30,10 +30,7 @@ public class Player : MonoBehaviour, IDamageble
             HealthChanged?.Invoke(_currentHealth, _health);
 
             if (_currentHealth <= 0)
-            {
-                Debug.Log("Player DIE");
                 Destroy(gameObject);
-            }
         }
         else
             Debug.Log("Отрицательное значение урона");

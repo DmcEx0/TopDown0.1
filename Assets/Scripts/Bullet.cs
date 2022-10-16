@@ -2,30 +2,33 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Bullet : MonoBehaviour
+[RequireComponent(typeof(Rigidbody))]
+public abstract class Bullet : MonoBehaviour, IMovable
 {
-    [SerializeField] private int _damage;
-    [SerializeField] private float _speed;
     [SerializeField] private float _lifeTime;
+    [SerializeField] protected int Damage;
+    [SerializeField] protected float Speed;
+
+    private Transform _parent;
+    private float _timeAfterSpaw;
 
     private Rigidbody _rb;
-    private Transform _parent;
-    private float _timeAfterSpaw = 0;
     private Vector3 _direction;
 
-    public void Init(Player target, Transform parent)
+    public void Init(GameObject target, Transform parent)
     {
         _direction = target.transform.position - transform.position;
         _parent = parent;
     }
 
-    public void Init(Enemy target, Transform parent)
+    public void Move()
     {
-        _direction = target.transform.position - transform.position;
-        _parent = parent;
+        Vector3 direction = new Vector3(_direction.x, 0, _direction.z);
+
+        _rb.MovePosition(_rb.position + direction.normalized * Speed * Time.fixedDeltaTime);
     }
 
-    private void Start()
+    private void Awake()
     {
         _rb = GetComponent<Rigidbody>();
     }
@@ -36,34 +39,18 @@ public class Bullet : MonoBehaviour
 
         if (_timeAfterSpaw >= _lifeTime)
         {
-            TurnOffBullet();    
+            TurnOffBullet();
             _timeAfterSpaw = 0;
         }
     }
 
-    private void FixedUpdate()
-    {
-        _rb.MovePosition(_rb.position + _direction.normalized * _speed * Time.fixedDeltaTime);
-    }
-
-    private void OnTriggerEnter(Collider other)
-    {
-        if (other.TryGetComponent(out Player player))
-        {
-            TurnOffBullet();
-            player.ApplyDamage(_damage);
-        }
-        else if (other.TryGetComponent(out Enemy enemy))
-        {
-            TurnOffBullet();
-            enemy.ApplyDamage(_damage);
-        }
-    }
-
-    private void TurnOffBullet()
+    protected void TurnOffBullet()
     {
         _timeAfterSpaw = 0;
         gameObject.SetActive(false);
         gameObject.transform.parent = _parent;
+
+        if (_parent != null)
+            gameObject.transform.position = _parent.transform.position;
     }
 }

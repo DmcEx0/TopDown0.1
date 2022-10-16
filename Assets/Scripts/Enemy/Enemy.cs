@@ -10,15 +10,17 @@ public class Enemy : MonoBehaviour, IDamageble
 
     private Player _target;
     private float _currentHealth;
+    private Transform _parent;
 
     public int Reward => _reward;
     public Player Target => _target;
 
     public event UnityAction<Enemy> Dying;
 
-    public void Init(Player target)
+    public void Init(Player target, Transform parent)
     {
         _target = target;
+        _parent = parent;
     }
 
     public void ApplyDamage(int value)
@@ -29,8 +31,6 @@ public class Enemy : MonoBehaviour, IDamageble
 
             if (_currentHealth <= 0)
             {
-                Debug.Log("Enemy DIE");
-
                 Dying?.Invoke(this);
                 gameObject.SetActive(false);
                 SetDefaultState();
@@ -42,11 +42,12 @@ public class Enemy : MonoBehaviour, IDamageble
 
     private void Start()
     {
-        SetDefaultState();
+        _currentHealth = _startHealth;
     }
 
     private void SetDefaultState()
     {
         _currentHealth = _startHealth;
+        gameObject.transform.position = _parent.transform.position;
     }
 }

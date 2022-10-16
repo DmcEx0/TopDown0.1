@@ -2,7 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerBehaviour : ObjectPool
+[RequireComponent(typeof(Rigidbody))]
+public class PlayerBehaviour : ObjectPool, IMovable
 {
     [SerializeField] private float _speed;
     [SerializeField] private Transform _shootPoint;
@@ -12,6 +13,22 @@ public class PlayerBehaviour : ObjectPool
     private PlayerController _playerController;
     private Rigidbody _rb;
     private float _timeAfterShot;
+
+    public void Move()
+    {
+        float minimalValue = 0.1f;
+
+        if (_playerController.Direction.sqrMagnitude < minimalValue)
+            return;
+
+        float scaleMoveSpeed = _speed * Time.fixedDeltaTime;
+
+        Vector2 direction = _playerController.Direction;
+
+        Vector3 moveDirection = new Vector3(direction.x, 0,direction.y);
+
+        _rb.MovePosition(_rb.position + moveDirection * scaleMoveSpeed);
+    }
 
     public void Shoot(Enemy target)
     {
@@ -35,23 +52,8 @@ public class PlayerBehaviour : ObjectPool
 
     private void FixedUpdate()
     {
-        Move(_playerController.Direction);
+        Move();
     }
-
-    private void Move(Vector2 direction)
-    {
-        float minimalValue = 0.1f;
-
-        if (direction.sqrMagnitude < minimalValue)
-            return;
-
-        float scaleMoveSpeed = _speed * Time.fixedDeltaTime;
-
-        Vector3 moveDirection = new Vector3(direction.x, 0, direction.y);
-
-        _rb.MovePosition(_rb.position + moveDirection * scaleMoveSpeed);
-    }
-
 
     private void SetBullet(GameObject bulletTemplate, Enemy target)
     {
@@ -60,6 +62,6 @@ public class PlayerBehaviour : ObjectPool
         bulletTemplate.transform.parent = null;
 
         Bullet bullet = bulletTemplate.GetComponent<Bullet>();
-        bullet.Init(target, Container.transform);
+        bullet.Init(target.gameObject, Container.transform);
     }
 }

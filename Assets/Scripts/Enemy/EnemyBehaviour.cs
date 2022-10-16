@@ -1,8 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
-public class EnemyBehaviour : ObjectPool
+[RequireComponent(typeof(Rigidbody))]
+public class EnemyBehaviour : ObjectPool, IMovable
 {
     [SerializeField] private Bullet _bulletTemplate;
     [SerializeField] private Transform _shootPoint;
@@ -22,6 +24,7 @@ public class EnemyBehaviour : ObjectPool
 
     public LayerMask LayerMask => _layerMask;
     public float AttackRange => _attackRange;
+    public float RotationSpeed => _rotationSpeed;
 
     public void Shoot()
     {
@@ -31,16 +34,19 @@ public class EnemyBehaviour : ObjectPool
 
     public void Move()
     {
+        if (_enemy.Target == null)
+            return;
+
         float scaleMoveSpeed = _speed * Time.fixedDeltaTime;
 
-        Vector3 moveDirection  = _enemy.Target.transform.position - transform.position;
+        Vector3 direction = _enemy.Target.transform.position - transform.position;
+
+        _rb.MovePosition(_rb.position + direction.normalized * scaleMoveSpeed);
 
         if (Target != null)
         {
-            _rb.MovePosition(_rb.position + moveDirection.normalized * scaleMoveSpeed);
-
-            Vector3 direction = _enemy.Target.transform.position - transform.position;
-            Quaternion rotation = Quaternion.LookRotation(direction);
+            Vector3 lookDirection = _enemy.Target.transform.position - _rb.position;
+            Quaternion rotation = Quaternion.LookRotation(lookDirection);
             transform.rotation = Quaternion.Lerp(transform.rotation, rotation, _rotationSpeed * Time.fixedDeltaTime);
         }
     }
@@ -78,7 +84,7 @@ public class EnemyBehaviour : ObjectPool
         bulletTemplate.transform.parent = null;
 
         Bullet bullet = bulletTemplate.GetComponent<Bullet>();
-        bullet.Init(Target, Container.transform);
+        bullet.Init(Target.gameObject, Container.transform);
     }
 
     private void OnDrawGizmosSelected()

@@ -30,7 +30,7 @@ public class Spawner : ObjectPool
         enemy.transform.position = _spawnPoints[randomIndex].position;
 
         Enemy enemyTemplate = enemy.GetComponent<Enemy>();
-        enemyTemplate.Init(_player);
+        enemyTemplate.Init(_player, Container.transform);
         enemyTemplate.Dying += OnEnemyDying;
     }
 

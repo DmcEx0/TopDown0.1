@@ -24,17 +24,16 @@ public class FollowState : State
 
         if (EnemyBehaviuor.Target == null)
             StateMachine.ChangeState(EnemyBehaviuor.IdleState);
-    }
-
-    public override void PhysicsUpdate()
-    {
-        base.PhysicsUpdate();
 
         int hits = Physics.OverlapSphereNonAlloc(EnemyBehaviuor.transform.position, _attackRange, _targetBuffer, EnemyBehaviuor.LayerMask);
 
         if (hits > 0)
             StateMachine.ChangeState(EnemyBehaviuor.AttackState);
+    }
 
+    public override void PhysicsUpdate()
+    {
+        base.PhysicsUpdate();
         EnemyBehaviuor.Move();
     }
 
