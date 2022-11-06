@@ -3,13 +3,20 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody))]
-public class PlayerBehaviour : ObjectPool, IMovable
+public class PlayerBehaviour : MonoBehaviour, IMovable
 {
     [SerializeField] private float _speed;
     [SerializeField] private Transform _shootPoint;
-    [SerializeField] private Bullet _bulletTemplate;
+    [SerializeField] private PlayerBullet _bulletTemplate;
     [SerializeField] private float _delay;
+    [SerializeField] private float _rotationSpeed;
+    [SerializeField] private int _poolCount = 10;
+    [SerializeField] private bool _isAutoExpand = false;
+    [SerializeField] private Transform _spawnPoolContainer;
 
+    private PoolMono<PlayerBullet> _bulletPool;
+
+    private Player _player;
     private PlayerController _playerController;
     private Rigidbody _rb;
     private float _timeAfterShot;
@@ -25,29 +32,27 @@ public class PlayerBehaviour : ObjectPool, IMovable
 
         Vector2 direction = _playerController.Direction;
 
-        Vector3 moveDirection = new Vector3(direction.x, 0,direction.y);
+        Vector3 moveDirection = new Vector3(direction.x, 0, direction.y);
 
         _rb.MovePosition(_rb.position + moveDirection * scaleMoveSpeed);
     }
 
-    public void Shoot(Enemy target)
-    {
-        _timeAfterShot += Time.deltaTime;
-
-        if (_timeAfterShot >= _delay)
-        {
-            if (TryGetObject(out GameObject bullet))
-                SetBullet(bullet, target);
-
-            _timeAfterShot = 0;
-        }
-    }
 
     private void Start()
     {
-        Initialize(_bulletTemplate.gameObject);
+        InitializePool();
         _playerController = GetComponent<PlayerController>();
         _rb = GetComponent<Rigidbody>();
+        _player = GetComponent<Player>();
+    }
+
+    private void Update()
+    {
+        if (_player.IsTargetReceived)
+        {
+            TurnToTarget();
+            Shoot(_player.Target);
+        }
     }
 
     private void FixedUpdate()
@@ -55,13 +60,36 @@ public class PlayerBehaviour : ObjectPool, IMovable
         Move();
     }
 
-    private void SetBullet(GameObject bulletTemplate, Enemy target)
+    private void InitializePool()
     {
-        bulletTemplate.SetActive(true);
-        bulletTemplate.transform.position = _shootPoint.transform.position;
-        bulletTemplate.transform.parent = null;
+        _bulletPool = new PoolMono<PlayerBullet>(_bulletTemplate, _poolCount, _spawnPoolContainer.transform);
+        _bulletPool.IsAutoExpand = _isAutoExpand;
+    }
 
-        Bullet bullet = bulletTemplate.GetComponent<Bullet>();
-        bullet.Init(target.gameObject, Container.transform);
+    private void SetBullet(Enemy target)
+    {
+        PlayerBullet playerBullet = _bulletPool.GetFreeElement();
+        playerBullet.transform.position = _shootPoint.position;
+        playerBullet.transform.parent = null;
+
+        playerBullet.Init(target.gameObject, _spawnPoolContainer.transform);
+    }
+
+    private void TurnToTarget()
+    {
+        Vector3 direction = _player.Target.transform.position - transform.position;
+        Quaternion rotation = Quaternion.LookRotation(direction);
+        transform.rotation = Quaternion.Lerp(transform.rotation, rotation, _rotationSpeed * Time.deltaTime);
+    }
+    private void Shoot(Enemy target)
+    {
+        _timeAfterShot += Time.deltaTime;
+
+        if (_timeAfterShot >= _delay)
+        {
+            SetBullet(target);
+
+            _timeAfterShot = 0;
+        }
     }
 }

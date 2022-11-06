@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
-public class Enemy : MonoBehaviour, IDamageble
+public abstract class Enemy : MonoBehaviour, IDamageble
 {
     [SerializeField] private int _startHealth;
     [SerializeField] private int _reward;

@@ -4,17 +4,17 @@ using UnityEngine;
 
 public class CameraMove : MonoBehaviour
 {
-    [SerializeField] private GameObject _player;
+    [SerializeField] private GameObject _target;
     [SerializeField] private Vector3 _distanceFromObject;
     [SerializeField] private float _speed;
 
-    private void LateUpdate()
+    private void FixedUpdate()
     {
-        if (_player == null)
+        if (_target == null)
             return;
 
-        Vector3 positionToGo = _player.transform.position + _distanceFromObject;
-        Vector3 smoothPosition = Vector3.Lerp(transform.position, positionToGo, _speed);
+        Vector3 positionToGo = _target.transform.position + _distanceFromObject;
+        Vector3 smoothPosition = Vector3.Lerp(transform.position, positionToGo, _speed * Time.fixedDeltaTime);
         transform.position = smoothPosition;
     }
 }

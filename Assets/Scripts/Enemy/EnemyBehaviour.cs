@@ -2,20 +2,28 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.AI;
 
 [RequireComponent(typeof(Rigidbody))]
-public class EnemyBehaviour : ObjectPool, IMovable
+public class EnemyBehaviour : MonoBehaviour, IMovable
 {
-    [SerializeField] private Bullet _bulletTemplate;
+    [SerializeField] private EnemyBullet _bulletTemplate;
     [SerializeField] private Transform _shootPoint;
     [SerializeField] private float _speed;
     [SerializeField] private float _rotationSpeed;
     [SerializeField] private float _attackRange;
     [SerializeField] private LayerMask _layerMask;
 
+    [SerializeField] private int _poolCount = 10;
+    [SerializeField] private bool _isAutoExpand = false;
+    [SerializeField] private Transform _spawnPoolContainer;
+
+    private PoolMono<EnemyBullet> _bulletPool;
+
     private StateMachine _stateMachine;
     private Enemy _enemy;
     private Rigidbody _rb;
+    private Collider _collider;
 
     public IdleState IdleState { get; private set; }
     public FollowState FollowState { get; private set; }
@@ -28,13 +36,12 @@ public class EnemyBehaviour : ObjectPool, IMovable
 
     public void Shoot()
     {
-        if (TryGetObject(out GameObject bullet))
-            SetBullet(bullet);
+        SetBullet();
     }
 
     public void Move()
     {
-        if (_enemy.Target == null)
+        if (Target == null)
             return;
 
         float scaleMoveSpeed = _speed * Time.fixedDeltaTime;
@@ -43,12 +50,14 @@ public class EnemyBehaviour : ObjectPool, IMovable
 
         _rb.MovePosition(_rb.position + direction.normalized * scaleMoveSpeed);
 
-        if (Target != null)
-        {
-            Vector3 lookDirection = _enemy.Target.transform.position - _rb.position;
-            Quaternion rotation = Quaternion.LookRotation(lookDirection);
-            transform.rotation = Quaternion.Lerp(transform.rotation, rotation, _rotationSpeed * Time.fixedDeltaTime);
-        }
+        Vector3 lookDirection = _enemy.Target.transform.position - _rb.position;
+        Quaternion rotation = Quaternion.LookRotation(lookDirection);
+        transform.rotation = Quaternion.Lerp(transform.rotation, rotation, _rotationSpeed * Time.fixedDeltaTime);
+    }
+
+    private void Awake()
+    {
+        _collider = GetComponent<Collider>();
     }
 
     private void Start()
@@ -56,7 +65,8 @@ public class EnemyBehaviour : ObjectPool, IMovable
         _enemy = GetComponent<Enemy>();
         _rb = GetComponent<Rigidbody>();
         _stateMachine = new StateMachine();
-        Initialize(_bulletTemplate.gameObject);
+
+        InitializePool();
 
         IdleState = new IdleState(this, _stateMachine);
         FollowState = new FollowState(this, _stateMachine);
@@ -77,14 +87,19 @@ public class EnemyBehaviour : ObjectPool, IMovable
         _stateMachine.CurrentState.PhysicsUpdate();
     }
 
-    private void SetBullet(GameObject bulletTemplate)
+    private void InitializePool()
     {
-        bulletTemplate.SetActive(true);
-        bulletTemplate.transform.position = _shootPoint.transform.position;
-        bulletTemplate.transform.parent = null;
+        _bulletPool = new PoolMono<EnemyBullet>(_bulletTemplate, _poolCount, _spawnPoolContainer.transform);
+        _bulletPool.IsAutoExpand = _isAutoExpand;
+    }
 
-        Bullet bullet = bulletTemplate.GetComponent<Bullet>();
-        bullet.Init(Target.gameObject, Container.transform);
+    private void SetBullet()
+    {
+        EnemyBullet bulletEnemy = _bulletPool.GetFreeElement();
+        bulletEnemy.transform.position = _shootPoint.position;
+        bulletEnemy.transform.parent = null;
+
+        bulletEnemy.Init(Target.gameObject, _spawnPoolContainer.transform);
     }
 
     private void OnDrawGizmosSelected()

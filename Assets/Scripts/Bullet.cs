@@ -23,9 +23,7 @@ public abstract class Bullet : MonoBehaviour, IMovable
 
     public void Move()
     {
-        Vector3 direction = new Vector3(_direction.x, 0, _direction.z);
-
-        _rb.MovePosition(_rb.position + direction.normalized * Speed * Time.fixedDeltaTime);
+        _rb.MovePosition(_rb.position + _direction.normalized * Speed * Time.fixedDeltaTime);
     }
 
     private void Awake()

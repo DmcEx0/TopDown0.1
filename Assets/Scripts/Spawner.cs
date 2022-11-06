@@ -2,49 +2,78 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Spawner : ObjectPool
+public class Spawner : MonoBehaviour
 {
-    [SerializeField] private Transform _spawnPointsContainer;
-    [SerializeField] private List<Wave> _waves;
-
     [SerializeField] private Player _player;
+    [SerializeField] private List<Wave> _waves;
+    [SerializeField] private Transform _spawnPointsContainer;
 
+    [SerializeField] private int _poolCount = 3;
+    [SerializeField] private bool _isAutoExpand = false;
+    [SerializeField] private Transform _spawnPoolContainer;
+
+    private List<PoolMono<Enemy>> _enemyPools = new List<PoolMono<Enemy>>();
+    private PoolMono<Enemy> _currentPool;
+
+    private int _currentPoolNumber = 0;
     private Transform[] _spawnPoints;
     private Wave _currentWave;
     private int _currentWaveNumber = 0;
     private int _spawned;
 
+    public void StartWave()
+    {
+        StartCoroutine(SpawnEnemy());
+    }
+
     private void Start()
     {
         SetSpawnPoints();
         SetWave(_currentWaveNumber);
-        Initialize(_currentWave.Template);
-        StartCoroutine(SpawnEnemy());
+
+        for (int i = 0; i < _currentWave.EnemiesInWave.Length; i++)
+        {
+            _enemyPools.Add(InitializePool(i));
+        }
+
+        SetPool(_currentPoolNumber);
     }
 
-    private void SetEnemy(GameObject enemy)
+    private PoolMono<Enemy> InitializePool(int index)
+    {
+        _currentPool = new PoolMono<Enemy>(_currentWave.EnemiesInWave[index].Template, _poolCount, _spawnPoolContainer.transform);
+        _currentPool.IsAutoExpand = _isAutoExpand;
+
+        return _currentPool;
+    }
+
+    private void SetEnemy()
     {
         int randomIndex = Random.Range(0, _spawnPoints.Length);
 
-        enemy.SetActive(true);
+        Enemy enemy = _currentPool.GetFreeElement();
         enemy.transform.position = _spawnPoints[randomIndex].position;
 
-        Enemy enemyTemplate = enemy.GetComponent<Enemy>();
-        enemyTemplate.Init(_player, Container.transform);
-        enemyTemplate.Dying += OnEnemyDying;
+        enemy.Init(_player, transform);
+        enemy.Dying += OnEnemyDying;
     }
 
     private IEnumerator SpawnEnemy()
     {
         WaitForSeconds delay = new WaitForSeconds(_currentWave.Delay);
+        int enemiesIndex = 0;
 
-        while (_spawned <= _currentWave.Count - 1)
+        while (enemiesIndex <= _currentWave.EnemiesInWave.Length - 1)
         {
-            if (TryGetObject(out GameObject enemy))
-            {
-                SetEnemy(enemy);
+            SetEnemy();
 
-                _spawned++;
+            _spawned++;
+
+            if (_spawned >= _currentWave.EnemiesInWave[enemiesIndex].Count)
+            {
+                SetPool(++_currentPoolNumber);
+                enemiesIndex++;
+                _spawned = 0;
             }
 
             yield return delay;
@@ -66,6 +95,12 @@ public class Spawner : ObjectPool
         _currentWave = _waves[index];
     }
 
+    private void SetPool(int index)
+    {
+        if (index <= _enemyPools.Count - 1)
+            _currentPool = _enemyPools[index];
+    }
+
     private void OnEnemyDying(Enemy enemy)
     {
         enemy.Dying -= OnEnemyDying;
@@ -75,9 +110,15 @@ public class Spawner : ObjectPool
 }
 
 [System.Serializable]
-public class Wave
+public struct Wave
 {
-    public GameObject Template;
     public float Delay;
+    public EnemiesInWave[] EnemiesInWave;
+}
+
+[System.Serializable]
+public struct EnemiesInWave
+{
+    public Enemy Template;
     public int Count;
 }
