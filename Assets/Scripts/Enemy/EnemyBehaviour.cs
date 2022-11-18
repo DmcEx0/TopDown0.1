@@ -2,28 +2,24 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.AI;
 
+[RequireComponent(typeof(Animator))]
 [RequireComponent(typeof(Rigidbody))]
-public class EnemyBehaviour : MonoBehaviour, IMovable
+public abstract class EnemyBehaviour : MonoBehaviour, IMovable
 {
-    [SerializeField] private EnemyBullet _bulletTemplate;
-    [SerializeField] private Transform _shootPoint;
     [SerializeField] private float _speed;
     [SerializeField] private float _rotationSpeed;
     [SerializeField] private float _attackRange;
     [SerializeField] private LayerMask _layerMask;
 
-    [SerializeField] private int _poolCount = 10;
-    [SerializeField] private bool _isAutoExpand = false;
-    [SerializeField] private Transform _spawnPoolContainer;
-
-    private PoolMono<EnemyBullet> _bulletPool;
-
     private StateMachine _stateMachine;
-    private Enemy _enemy;
     private Rigidbody _rb;
-    private Collider _collider;
+    private Animator _animator;
+
+    private OgreBehaviour _ogreBehaviour;
+    private MageBehaviour _mageBehaviour;
+
+    protected Enemy Enemy;
 
     public IdleState IdleState { get; private set; }
     public FollowState FollowState { get; private set; }
@@ -33,11 +29,7 @@ public class EnemyBehaviour : MonoBehaviour, IMovable
     public LayerMask LayerMask => _layerMask;
     public float AttackRange => _attackRange;
     public float RotationSpeed => _rotationSpeed;
-
-    public void Shoot()
-    {
-        SetBullet();
-    }
+    public Animator Animator => _animator;
 
     public void Move()
     {
@@ -46,27 +38,33 @@ public class EnemyBehaviour : MonoBehaviour, IMovable
 
         float scaleMoveSpeed = _speed * Time.fixedDeltaTime;
 
-        Vector3 direction = _enemy.Target.transform.position - transform.position;
+        Vector3 direction = Enemy.Target.transform.position - transform.position;
 
         _rb.MovePosition(_rb.position + direction.normalized * scaleMoveSpeed);
 
-        Vector3 lookDirection = _enemy.Target.transform.position - _rb.position;
-        Quaternion rotation = Quaternion.LookRotation(lookDirection);
+        Vector3 targetDirection = Enemy.Target.transform.position - _rb.position;
+        Quaternion rotation = Quaternion.LookRotation(targetDirection);
         transform.rotation = Quaternion.Lerp(transform.rotation, rotation, _rotationSpeed * Time.fixedDeltaTime);
     }
 
-    private void Awake()
+    public void Shoot()
     {
-        _collider = GetComponent<Collider>();
+        if (_ogreBehaviour != null)
+            _ogreBehaviour.OgreAttacked();
+
+        if (_mageBehaviour != null)
+            _mageBehaviour.MageAttacked();
     }
 
     private void Start()
     {
-        _enemy = GetComponent<Enemy>();
+        _ogreBehaviour = GetComponent<OgreBehaviour>();
+        _mageBehaviour = GetComponent<MageBehaviour>();
+
+        _animator = GetComponent<Animator>();
+        Enemy = GetComponent<Enemy>();
         _rb = GetComponent<Rigidbody>();
         _stateMachine = new StateMachine();
-
-        InitializePool();
 
         IdleState = new IdleState(this, _stateMachine);
         FollowState = new FollowState(this, _stateMachine);
@@ -74,7 +72,7 @@ public class EnemyBehaviour : MonoBehaviour, IMovable
 
         _stateMachine.Initialize(IdleState);
 
-        Target = _enemy.Target;
+        Target = Enemy.Target;
     }
 
     private void Update()
@@ -85,21 +83,6 @@ public class EnemyBehaviour : MonoBehaviour, IMovable
     private void FixedUpdate()
     {
         _stateMachine.CurrentState.PhysicsUpdate();
-    }
-
-    private void InitializePool()
-    {
-        _bulletPool = new PoolMono<EnemyBullet>(_bulletTemplate, _poolCount, _spawnPoolContainer.transform);
-        _bulletPool.IsAutoExpand = _isAutoExpand;
-    }
-
-    private void SetBullet()
-    {
-        EnemyBullet bulletEnemy = _bulletPool.GetFreeElement();
-        bulletEnemy.transform.position = _shootPoint.position;
-        bulletEnemy.transform.parent = null;
-
-        bulletEnemy.Init(Target.gameObject, _spawnPoolContainer.transform);
     }
 
     private void OnDrawGizmosSelected()

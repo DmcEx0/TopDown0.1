@@ -18,12 +18,6 @@ public class AttackState : State
         _shootJob = EnemyBehaviuor.StartCoroutine(DoShoot());
     }
 
-    public override void Exit()
-    {
-        base.Exit();
-        EnemyBehaviuor.StopCoroutine(_shootJob);
-    }
-
     public override void LogicUpdate()
     {
         base.LogicUpdate();
@@ -40,6 +34,11 @@ public class AttackState : State
             EnemyBehaviuor.transform.rotation = Quaternion.Lerp(EnemyBehaviuor.transform.rotation, rotation, EnemyBehaviuor.RotationSpeed * Time.fixedDeltaTime);
         }
     }
+    public override void Exit()
+    {
+        base.Exit();
+        EnemyBehaviuor.StopCoroutine(_shootJob);
+    }
 
     public override void PhysicsUpdate()
     {
@@ -52,6 +51,7 @@ public class AttackState : State
 
         while (EnemyBehaviuor.Target != null)
         {
+            EnemyBehaviuor.Animator.SetTrigger("Shoot");
             EnemyBehaviuor.Shoot();
             yield return delay;
         }

@@ -1,39 +1,65 @@
+using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
-public class ObjectPool : MonoBehaviour
+public class ObjectPool<T> where T : MonoBehaviour
 {
-    [SerializeField] private GameObject _container;
-    [SerializeField] private int _capacity;
+    public T Prefab { get; private set; }
+    public bool IsAutoExpand { get; set; }
+    public Transform Container { get; private set; }
 
-    private List<GameObject> _pool = new List<GameObject>();
+    private List<T> _pool;
 
-    protected GameObject Container => _container;
-
-    public void ResetPool()
+    public ObjectPool(T prefab, int count, Transform container)
     {
-        foreach (var item in _pool)
-        {
-            item.SetActive(false);
-        }
+        Prefab = prefab;
+        Container = container;
+
+        CreatePool(count);
     }
 
-    protected void Initialize(GameObject prefab)
+    public bool HasFreeElement(out T element)
     {
-        for (int i = 0; i < _capacity; i++)
+        foreach (var elementInPool in _pool)
         {
-            GameObject spawned = Instantiate(prefab, _container.transform.position, Quaternion.identity, _container.transform);
-            spawned.SetActive(false);
-
-            _pool.Add(spawned);
+            if (elementInPool.gameObject.activeInHierarchy == false)
+            {
+                element = elementInPool;
+                elementInPool.gameObject.SetActive(true);
+                return true;
+            }
         }
+
+        element = null;
+        return false;
     }
 
-    protected bool TryGetObject(out GameObject result)
+    public T GetFreeElement()
     {
-        result = _pool.FirstOrDefault(p => p.activeSelf == false);
+        if (HasFreeElement(out var element))
+            return element;
 
-        return result != null;
+        if (IsAutoExpand)
+            return CreateObject(true);
+
+        throw new Exception($"There is no free element in pool of type {typeof(T)}");
+    }
+
+    private void CreatePool(int count)
+    {
+        _pool = new List<T>();
+
+        for (int i = 0; i < count; i++)
+            CreateObject();
+    }
+
+    private T CreateObject(bool isActiveByDefault = false)
+    {
+        var createdObject = GameObject.Instantiate(Prefab, Container);
+        createdObject.gameObject.SetActive(isActiveByDefault);
+
+        _pool.Add(createdObject);
+        return createdObject;
     }
 }

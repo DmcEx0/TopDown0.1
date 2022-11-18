@@ -11,7 +11,7 @@ public class IdleState : State
     public override void Enter()
     {
         base.Enter();
-        
+        EnemyBehaviuor.Animator.SetBool("IsVictory", true);
     }
 
     public override void LogicUpdate()
@@ -24,14 +24,11 @@ public class IdleState : State
     public override void PhysicsUpdate()
     {
         base.PhysicsUpdate();
-        Rotate();
     }
 
-    private void Rotate() // ????????????????
+    public override void Exit()
     {
-        float a = 0;
-        a += 10;
-        Vector3 rotate = new Vector3(0f, a, 0f);
-        EnemyBehaviuor.transform.Rotate(rotate);
+        base.Exit();
+        EnemyBehaviuor.Animator.SetBool("IsVictory", false);
     }
 }

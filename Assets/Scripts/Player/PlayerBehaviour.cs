@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(Animator))]
 [RequireComponent(typeof(Rigidbody))]
 public class PlayerBehaviour : MonoBehaviour, IMovable
 {
@@ -14,12 +15,14 @@ public class PlayerBehaviour : MonoBehaviour, IMovable
     [SerializeField] private bool _isAutoExpand = false;
     [SerializeField] private Transform _spawnPoolContainer;
 
-    private PoolMono<PlayerBullet> _bulletPool;
+    private ObjectPool<PlayerBullet> _bulletPool;
 
     private Player _player;
     private PlayerController _playerController;
     private Rigidbody _rb;
+    private Animator _animator;
     private float _timeAfterShot;
+    private bool _isRunning;
 
     public void Move()
     {
@@ -35,6 +38,8 @@ public class PlayerBehaviour : MonoBehaviour, IMovable
         Vector3 moveDirection = new Vector3(direction.x, 0, direction.y);
 
         _rb.MovePosition(_rb.position + moveDirection * scaleMoveSpeed);
+
+        
     }
 
 
@@ -43,6 +48,7 @@ public class PlayerBehaviour : MonoBehaviour, IMovable
         InitializePool();
         _playerController = GetComponent<PlayerController>();
         _rb = GetComponent<Rigidbody>();
+        _animator = GetComponent<Animator>();
         _player = GetComponent<Player>();
     }
 
@@ -53,6 +59,11 @@ public class PlayerBehaviour : MonoBehaviour, IMovable
             TurnToTarget();
             Shoot(_player.Target);
         }
+
+        if (_playerController.Direction.x != 0 || _playerController.Direction.y != 0)
+            _animator.SetBool("IsRunning", true);
+        else
+            _animator.SetBool("IsRunning", false);
     }
 
     private void FixedUpdate()
@@ -62,7 +73,7 @@ public class PlayerBehaviour : MonoBehaviour, IMovable
 
     private void InitializePool()
     {
-        _bulletPool = new PoolMono<PlayerBullet>(_bulletTemplate, _poolCount, _spawnPoolContainer.transform);
+        _bulletPool = new ObjectPool<PlayerBullet>(_bulletTemplate, _poolCount, _spawnPoolContainer.transform);
         _bulletPool.IsAutoExpand = _isAutoExpand;
     }
 
@@ -87,8 +98,8 @@ public class PlayerBehaviour : MonoBehaviour, IMovable
 
         if (_timeAfterShot >= _delay)
         {
+            _animator.SetTrigger("IsShooting");
             SetBullet(target);
-
             _timeAfterShot = 0;
         }
     }

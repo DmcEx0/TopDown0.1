@@ -12,8 +12,8 @@ public class Spawner : MonoBehaviour
     [SerializeField] private bool _isAutoExpand = false;
     [SerializeField] private Transform _spawnPoolContainer;
 
-    private List<PoolMono<Enemy>> _enemyPools = new List<PoolMono<Enemy>>();
-    private PoolMono<Enemy> _currentPool;
+    private List<ObjectPool<Enemy>> _enemyPools = new List<ObjectPool<Enemy>>();
+    private ObjectPool<Enemy> _currentPool;
 
     private int _currentPoolNumber = 0;
     private Transform[] _spawnPoints;
@@ -39,9 +39,9 @@ public class Spawner : MonoBehaviour
         SetPool(_currentPoolNumber);
     }
 
-    private PoolMono<Enemy> InitializePool(int index)
+    private ObjectPool<Enemy> InitializePool(int index)
     {
-        _currentPool = new PoolMono<Enemy>(_currentWave.EnemiesInWave[index].Template, _poolCount, _spawnPoolContainer.transform);
+        _currentPool = new ObjectPool<Enemy>(_currentWave.EnemiesInWave[index].Template, _poolCount, _spawnPoolContainer.transform);
         _currentPool.IsAutoExpand = _isAutoExpand;
 
         return _currentPool;

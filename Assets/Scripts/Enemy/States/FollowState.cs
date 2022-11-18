@@ -16,6 +16,7 @@ public class FollowState : State
     {
         base.Enter();
         _attackRange = EnemyBehaviuor.AttackRange - _permissibleError;
+        EnemyBehaviuor.Animator.SetBool("IsRunning", true);
     }
 
     public override void LogicUpdate()
@@ -40,5 +41,6 @@ public class FollowState : State
     public override void Exit()
     {
         base.Exit();
+        EnemyBehaviuor.Animator.SetBool("IsRunning", false);
     }
 }
