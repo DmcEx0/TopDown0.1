@@ -11,13 +11,11 @@ public class MageBehaviour : EnemyBehaviour
     [SerializeField] private int _poolCount = 10;
     [SerializeField] private bool _isAutoExpand = false;
 
-    private ObjectPool<EnemyBullet> _bulletPool;
     private MageEnemy _mageEnemy;
+    private ObjectPool<EnemyBullet> _bulletPool;
 
-    public override void Shoot()
-    {
-        SetBullet();
-    }
+    public void MageAttacked() => SetBullet();
+
 
     private void Awake()
     {

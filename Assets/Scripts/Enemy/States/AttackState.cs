@@ -34,15 +34,16 @@ public class AttackState : State
             EnemyBehaviuor.transform.rotation = Quaternion.Lerp(EnemyBehaviuor.transform.rotation, rotation, EnemyBehaviuor.RotationSpeed * Time.fixedDeltaTime);
         }
     }
-    public override void Exit()
-    {
-        base.Exit();
-        EnemyBehaviuor.StopCoroutine(_shootJob);
-    }
 
     public override void PhysicsUpdate()
     {
         base.PhysicsUpdate();
+    }
+
+    public override void Exit()
+    {
+        base.Exit();
+        EnemyBehaviuor.StopCoroutine(_shootJob);
     }
 
     private IEnumerator DoShoot()

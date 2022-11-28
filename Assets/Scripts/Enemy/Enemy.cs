@@ -7,6 +7,8 @@ public abstract class Enemy : MonoBehaviour, IDamageble
 {
     [SerializeField] private int _startHealth;
     [SerializeField] private int _reward;
+    [SerializeField] private int _damage;
+    [SerializeField] private float _dealydelayBeforeFiring;
 
     private Player _target;
     private float _currentHealth;
@@ -14,6 +16,7 @@ public abstract class Enemy : MonoBehaviour, IDamageble
 
     public int Reward => _reward;
     public Player Target => _target;
+    public int Damage => _damage;
 
     public event UnityAction<Enemy> Dying;
 

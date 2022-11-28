@@ -4,7 +4,4 @@ using UnityEngine;
 
 public class OgreEnemy : Enemy
 {
-    [SerializeField] private int _damage;
-
-    public int Damage => _damage;
 }

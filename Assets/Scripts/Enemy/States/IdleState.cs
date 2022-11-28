@@ -11,12 +11,14 @@ public class IdleState : State
     public override void Enter()
     {
         base.Enter();
+
         EnemyBehaviuor.Animator.SetBool("IsVictory", true);
     }
 
     public override void LogicUpdate()
     {
         base.LogicUpdate();
+
         if (EnemyBehaviuor.Target != null)
             StateMachine.ChangeState(EnemyBehaviuor.FollowState);
     }
@@ -29,6 +31,7 @@ public class IdleState : State
     public override void Exit()
     {
         base.Exit();
+
         EnemyBehaviuor.Animator.SetBool("IsVictory", false);
     }
 }

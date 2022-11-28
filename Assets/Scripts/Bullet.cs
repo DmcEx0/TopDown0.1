@@ -6,7 +6,6 @@ using UnityEngine;
 public abstract class Bullet : MonoBehaviour, IMovable
 {
     [SerializeField] private float _lifeTime;
-    [SerializeField] protected int Damage;
     [SerializeField] protected float Speed;
 
     private Transform _parent;
@@ -14,6 +13,8 @@ public abstract class Bullet : MonoBehaviour, IMovable
 
     private Rigidbody _rb;
     private Vector3 _direction;
+
+    protected int Damage;
 
     public void Init(GameObject target, Transform parent)
     {
@@ -24,6 +25,11 @@ public abstract class Bullet : MonoBehaviour, IMovable
     public void Move()
     {
         _rb.MovePosition(_rb.position + _direction.normalized * Speed * Time.fixedDeltaTime);
+    }
+
+    public void SetDamage(int damage)
+    {
+        Damage = damage;
     }
 
     private void Awake()

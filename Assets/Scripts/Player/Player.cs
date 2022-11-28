@@ -5,6 +5,7 @@ using UnityEngine.Events;
 
 public class Player : MonoBehaviour, IDamageble
 {
+    [SerializeField] private int _damage;
     [SerializeField] private int _health;
     [SerializeField] private int _money;
     [SerializeField] private LayerMask _layerMask;
@@ -17,6 +18,7 @@ public class Player : MonoBehaviour, IDamageble
 
     public bool IsTargetReceived { get; private set; }
     public Enemy Target => _target;
+    public int Damage => _damage;
 
     public event UnityAction<int> MoneyChanged;
     public event UnityAction<int, int> HealthChanged;

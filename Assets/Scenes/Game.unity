@@ -324,8 +324,10 @@ MonoBehaviour:
     EnemiesInWave:
     - Template: {fileID: 7232441860117235078, guid: 83b5a3b45281d7c4bb3661ff41a8f3d5, type: 3}
       Count: 5
+    - Template: {fileID: 7091336944801411435, guid: a33f783a5e1a169438689046d11ed3cc, type: 3}
+      Count: 2
   _spawnPointsContainer: {fileID: 449799342}
-  _poolCount: 10
+  _poolCount: 5
   _isAutoExpand: 1
   _spawnPoolContainer: {fileID: 1532177777}
 --- !u!4 &449799342
@@ -1743,6 +1745,10 @@ PrefabInstance:
     - target: {fileID: 3799784555411320591, guid: b2b3addb53726f8439279b270e926bc1, type: 3}
       propertyPath: m_IsActive
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3799784555411320594, guid: b2b3addb53726f8439279b270e926bc1, type: 3}
+      propertyPath: _damage
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 3799784555411320594, guid: b2b3addb53726f8439279b270e926bc1, type: 3}
       propertyPath: _health

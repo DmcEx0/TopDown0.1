@@ -948,6 +948,7 @@ MonoBehaviour:
   _startHealth: 100
   _reward: 5
   _damage: 10
+  _dealydelayBeforeFiring: 1.27
 --- !u!114 &3834325011376473079
 MonoBehaviour:
   m_ObjectHideFlags: 0

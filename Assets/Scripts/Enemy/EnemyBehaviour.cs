@@ -12,24 +12,24 @@ public abstract class EnemyBehaviour : MonoBehaviour, IMovable
     [SerializeField] private float _attackRange;
     [SerializeField] private LayerMask _layerMask;
 
-    private StateMachine _stateMachine;
     private Rigidbody _rb;
     private Animator _animator;
 
-    private OgreBehaviour _ogreBehaviour;
-    private MageBehaviour _mageBehaviour;
-
     protected Enemy Enemy;
+    private StateMachine _stateMachine;
 
     public IdleState IdleState { get; private set; }
     public FollowState FollowState { get; private set; }
     public AttackState AttackState { get; private set; }
+
     public Player Target { get; private set; }
 
     public LayerMask LayerMask => _layerMask;
     public float AttackRange => _attackRange;
     public float RotationSpeed => _rotationSpeed;
     public Animator Animator => _animator;
+
+    public abstract void Shoot();
 
     public void Move()
     {
@@ -47,32 +47,19 @@ public abstract class EnemyBehaviour : MonoBehaviour, IMovable
         transform.rotation = Quaternion.Lerp(transform.rotation, rotation, _rotationSpeed * Time.fixedDeltaTime);
     }
 
-    public void Shoot()
-    {
-        if (_ogreBehaviour != null)
-            _ogreBehaviour.OgreAttacked();
-
-        if (_mageBehaviour != null)
-            _mageBehaviour.MageAttacked();
-    }
-
     private void Start()
     {
-        _ogreBehaviour = GetComponent<OgreBehaviour>();
-        _mageBehaviour = GetComponent<MageBehaviour>();
-
+        _stateMachine = new StateMachine();
         _animator = GetComponent<Animator>();
         Enemy = GetComponent<Enemy>();
         _rb = GetComponent<Rigidbody>();
-        _stateMachine = new StateMachine();
 
         IdleState = new IdleState(this, _stateMachine);
         FollowState = new FollowState(this, _stateMachine);
         AttackState = new AttackState(this, _stateMachine);
 
-        _stateMachine.Initialize(IdleState);
-
         Target = Enemy.Target;
+        _stateMachine.Initialize(IdleState);
     }
 
     private void Update()

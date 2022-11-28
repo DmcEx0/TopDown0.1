@@ -2416,6 +2416,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _startHealth: 40
   _reward: 10
+  _damage: 7
+  _dealydelayBeforeFiring: 0.75
 --- !u!1 &306182189952180130
 GameObject:
   m_ObjectHideFlags: 0

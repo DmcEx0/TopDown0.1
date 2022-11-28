@@ -22,7 +22,6 @@ public class PlayerBehaviour : MonoBehaviour, IMovable
     private Rigidbody _rb;
     private Animator _animator;
     private float _timeAfterShot;
-    private bool _isRunning;
 
     public void Move()
     {
@@ -37,11 +36,8 @@ public class PlayerBehaviour : MonoBehaviour, IMovable
 
         Vector3 moveDirection = new Vector3(direction.x, 0, direction.y);
 
-        _rb.MovePosition(_rb.position + moveDirection * scaleMoveSpeed);
-
-        
+        _rb.MovePosition(_rb.position + moveDirection * scaleMoveSpeed);        
     }
-
 
     private void Start()
     {
@@ -84,6 +80,7 @@ public class PlayerBehaviour : MonoBehaviour, IMovable
         playerBullet.transform.parent = null;
 
         playerBullet.Init(target.gameObject, _spawnPoolContainer.transform);
+        playerBullet.SetDamage(_player.Damage);
     }
 
     private void TurnToTarget()
