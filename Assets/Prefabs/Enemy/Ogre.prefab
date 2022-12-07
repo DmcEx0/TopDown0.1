@@ -853,10 +853,10 @@ GameObject:
   m_Component:
   - component: {fileID: 7232441860117235077}
   - component: {fileID: 7232441860117235322}
-  - component: {fileID: 7232441860117235073}
   - component: {fileID: 7232441860117235072}
   - component: {fileID: 7232441860117235078}
   - component: {fileID: 3834325011376473079}
+  - component: {fileID: 1946590594008502825}
   m_Layer: 7
   m_Name: Ogre
   m_TagString: Untagged
@@ -903,22 +903,6 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
---- !u!54 &7232441860117235073
-Rigidbody:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7232441860117235323}
-  serializedVersion: 2
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
-  m_UseGravity: 1
-  m_IsKinematic: 0
-  m_Interpolate: 0
-  m_Constraints: 84
-  m_CollisionDetection: 0
 --- !u!136 &7232441860117235072
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -929,10 +913,10 @@ CapsuleCollider:
   m_Material: {fileID: 0}
   m_IsTrigger: 0
   m_Enabled: 1
-  m_Radius: 0.677886
-  m_Height: 2.4704304
+  m_Radius: 0.99958766
+  m_Height: 2.4897437
   m_Direction: 1
-  m_Center: {x: 0.013057709, y: 0.7352152, z: 0}
+  m_Center: {x: -0.030473351, y: 0.74487185, z: 0}
 --- !u!114 &7232441860117235078
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -945,10 +929,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f8b03a08f5d4a2a49a9a67b614b1c6d3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _startHealth: 100
+  _startHealth: 70
   _reward: 5
   _damage: 10
-  _dealydelayBeforeFiring: 1.27
+  _delayBeforeFiring: 0.7
 --- !u!114 &3834325011376473079
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -961,12 +945,35 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 82ae631d53036434d90c5551172c8c3b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _speed: 3
-  _rotationSpeed: 5
-  _attackRange: 2
+  _speed: 5
+  _angularSpeed: 200
+  _attackRange: 3
   _layerMask:
     serializedVersion: 2
     m_Bits: 64
+  _agent: {fileID: 1946590594008502825}
+--- !u!195 &1946590594008502825
+NavMeshAgent:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7232441860117235323}
+  m_Enabled: 1
+  m_AgentTypeID: 1479372276
+  m_Radius: 0.5
+  m_Speed: 3.5
+  m_Acceleration: 20
+  avoidancePriority: 50
+  m_AngularSpeed: 120
+  m_StoppingDistance: 0
+  m_AutoTraverseOffMeshLink: 1
+  m_AutoBraking: 1
+  m_AutoRepath: 1
+  m_Height: 2
+  m_BaseOffset: 0
+  m_WalkableMask: 4294967295
+  m_ObstacleAvoidanceType: 1
 --- !u!1 &8435174091681014692
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -8,7 +6,7 @@ public abstract class Enemy : MonoBehaviour, IDamageble
     [SerializeField] private int _startHealth;
     [SerializeField] private int _reward;
     [SerializeField] private int _damage;
-    [SerializeField] private float _dealydelayBeforeFiring;
+    [SerializeField] private float _delayBeforeFiring;
 
     private Player _target;
     private float _currentHealth;
@@ -17,6 +15,7 @@ public abstract class Enemy : MonoBehaviour, IDamageble
     public int Reward => _reward;
     public Player Target => _target;
     public int Damage => _damage;
+    public float DelayBeforeFiring => _delayBeforeFiring;
 
     public event UnityAction<Enemy> Dying;
 

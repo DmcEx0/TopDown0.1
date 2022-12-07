@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
@@ -6,6 +5,7 @@ using UnityEngine.Events;
 public class Player : MonoBehaviour, IDamageble
 {
     [SerializeField] private int _damage;
+    [SerializeField] private float _delayBeforeFiring;
     [SerializeField] private int _health;
     [SerializeField] private int _money;
     [SerializeField] private LayerMask _layerMask;
@@ -19,6 +19,7 @@ public class Player : MonoBehaviour, IDamageble
     public bool IsTargetReceived { get; private set; }
     public Enemy Target => _target;
     public int Damage => _damage;
+    public float DelayBeforeFiring => _delayBeforeFiring;
 
     public event UnityAction<int> MoneyChanged;
     public event UnityAction<int, int> HealthChanged;

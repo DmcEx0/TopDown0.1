@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class FollowState : State
@@ -17,6 +15,7 @@ public class FollowState : State
         base.Enter();
         _attackRange = EnemyBehaviuor.AttackRange - _permissibleError;
         EnemyBehaviuor.Animator.SetBool("IsRunning", true);
+        EnemyBehaviuor.Agent.isStopped = false;
     }
 
     public override void LogicUpdate()
@@ -30,17 +29,19 @@ public class FollowState : State
 
         if (hits > 0)
             StateMachine.ChangeState(EnemyBehaviuor.AttackState);
+
+        EnemyBehaviuor.Move();
     }
 
     public override void PhysicsUpdate()
     {
         base.PhysicsUpdate();
-        EnemyBehaviuor.Move();
     }
 
     public override void Exit()
     {
         base.Exit();
         EnemyBehaviuor.Animator.SetBool("IsRunning", false);
+        EnemyBehaviuor.Agent.isStopped = true;
     }
 }

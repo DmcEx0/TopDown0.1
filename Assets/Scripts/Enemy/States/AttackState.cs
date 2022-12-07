@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class AttackState : State
@@ -16,6 +15,7 @@ public class AttackState : State
     {
         base.Enter();
         _shootJob = EnemyBehaviuor.StartCoroutine(DoShoot());
+        //EnemyBehaviuor.Rigidbody.velocity = Vector3.zero;
     }
 
     public override void LogicUpdate()
@@ -29,9 +29,11 @@ public class AttackState : State
 
         if (EnemyBehaviuor.Target != null)
         {
-            Vector3 direction = EnemyBehaviuor.Target.transform.position - EnemyBehaviuor.transform.position;
-            Quaternion rotation = Quaternion.LookRotation(direction);
-            EnemyBehaviuor.transform.rotation = Quaternion.Lerp(EnemyBehaviuor.transform.rotation, rotation, EnemyBehaviuor.RotationSpeed * Time.fixedDeltaTime);
+            Vector3 targetDirection = EnemyBehaviuor.Target.transform.position - EnemyBehaviuor.transform.position;
+            Vector3 lookDirection = new Vector3(targetDirection.x, 0, targetDirection.z);
+            Quaternion rotation = Quaternion.LookRotation(lookDirection);
+
+            EnemyBehaviuor.transform.rotation = Quaternion.Lerp(EnemyBehaviuor.transform.rotation, rotation, EnemyBehaviuor.AngularSpeed * Time.fixedDeltaTime);
         }
     }
 
@@ -48,7 +50,7 @@ public class AttackState : State
 
     private IEnumerator DoShoot()
     {
-        WaitForSeconds delay = new WaitForSeconds(1);
+        WaitForSeconds delay = new WaitForSeconds(EnemyBehaviuor.DelayBeforeFiring);
 
         while (EnemyBehaviuor.Target != null)
         {

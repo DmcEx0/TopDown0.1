@@ -410,10 +410,10 @@ GameObject:
   - component: {fileID: 3799784555410961199}
   - component: {fileID: 3799784555420835023}
   - component: {fileID: 3799784555411320598}
-  - component: {fileID: 3799784555411320592}
   - component: {fileID: 3799784555411320594}
   - component: {fileID: 3799784555411320588}
   - component: {fileID: 3799784555411320590}
+  - component: {fileID: 458976256479514484}
   m_Layer: 6
   m_Name: Player
   m_TagString: Untagged
@@ -473,22 +473,6 @@ SphereCollider:
   serializedVersion: 2
   m_Radius: 0.44721282
   m_Center: {x: 0, y: 1.4682521, z: 0}
---- !u!54 &3799784555411320592
-Rigidbody:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3799784555411320591}
-  serializedVersion: 2
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
-  m_UseGravity: 0
-  m_IsKinematic: 0
-  m_Interpolate: 0
-  m_Constraints: 84
-  m_CollisionDetection: 0
 --- !u!114 &3799784555411320594
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -501,6 +485,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 72006a6293d51934e9577b62382af333, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _damage: 0
+  _delayBeforeFiring: 0
   _health: 200
   _money: 0
   _layerMask:
@@ -520,13 +506,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _speed: 5
+  _angularSpeed: 0
   _shootPoint: {fileID: 1396750762216714190}
+  _agent: {fileID: 0}
   _bulletTemplate: {fileID: 4320747328165003924, guid: c73963b559f058f4d85526d1ef3f0dfc, type: 3}
-  _delay: 1
-  _rotationSpeed: 5
+  _spawnPoolContainer: {fileID: 1396750760281499387}
   _poolCount: 10
   _isAutoExpand: 0
-  _spawnPoolContainer: {fileID: 1396750760281499387}
 --- !u!114 &3799784555411320590
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -539,6 +525,28 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f9947947e53186448b6eccffc5d7eedf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!195 &458976256479514484
+NavMeshAgent:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3799784555411320591}
+  m_Enabled: 1
+  m_AgentTypeID: 0
+  m_Radius: 0.5
+  m_Speed: 3.5
+  m_Acceleration: 8
+  avoidancePriority: 50
+  m_AngularSpeed: 120
+  m_StoppingDistance: 0
+  m_AutoTraverseOffMeshLink: 1
+  m_AutoBraking: 1
+  m_AutoRepath: 1
+  m_Height: 2
+  m_BaseOffset: 0
+  m_WalkableMask: 4294967295
+  m_ObstacleAvoidanceType: 4
 --- !u!1 &3799784555411320593
 GameObject:
   m_ObjectHideFlags: 0

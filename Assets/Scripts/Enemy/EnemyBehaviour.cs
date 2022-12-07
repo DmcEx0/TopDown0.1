@@ -1,33 +1,36 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Events;
+using UnityEngine.AI;
 
 [RequireComponent(typeof(Animator))]
-[RequireComponent(typeof(Rigidbody))]
+//[RequireComponent(typeof(Rigidbody))]
+[RequireComponent(typeof(NavMeshAgent))]
 public abstract class EnemyBehaviour : MonoBehaviour, IMovable
 {
-    [SerializeField] private float _speed;
-    [SerializeField] private float _rotationSpeed;
+    [SerializeField] private float _speed = 4;
+    [SerializeField] private float _angularSpeed = 100;
     [SerializeField] private float _attackRange;
     [SerializeField] private LayerMask _layerMask;
+    [SerializeField] private NavMeshAgent _agent;
 
-    private Rigidbody _rb;
+    //private Rigidbody _rb;
     private Animator _animator;
+    private StateMachine _stateMachine;
 
     protected Enemy Enemy;
-    private StateMachine _stateMachine;
 
     public IdleState IdleState { get; private set; }
     public FollowState FollowState { get; private set; }
     public AttackState AttackState { get; private set; }
 
     public Player Target { get; private set; }
+    public NavMeshAgent Agent => _agent;
+    //public Rigidbody Rigidbody => _rb;
 
     public LayerMask LayerMask => _layerMask;
     public float AttackRange => _attackRange;
-    public float RotationSpeed => _rotationSpeed;
+    public float AngularSpeed => _angularSpeed;
     public Animator Animator => _animator;
+    public float DelayBeforeFiring => Enemy.DelayBeforeFiring;
 
     public abstract void Shoot();
 
@@ -36,15 +39,20 @@ public abstract class EnemyBehaviour : MonoBehaviour, IMovable
         if (Target == null)
             return;
 
-        float scaleMoveSpeed = _speed * Time.fixedDeltaTime;
+        _agent.SetDestination(Target.transform.position);
 
-        Vector3 direction = Enemy.Target.transform.position - transform.position;
+        //float scaleMoveSpeed = _speed * Time.fixedDeltaTime;
 
-        _rb.MovePosition(_rb.position + direction.normalized * scaleMoveSpeed);
+        //Vector3 direction = Enemy.Target.transform.position - transform.position;
 
-        Vector3 targetDirection = Enemy.Target.transform.position - _rb.position;
-        Quaternion rotation = Quaternion.LookRotation(targetDirection);
-        transform.rotation = Quaternion.Lerp(transform.rotation, rotation, _rotationSpeed * Time.fixedDeltaTime);
+        //_rb.MovePosition(_rb.position + direction.normalized * scaleMoveSpeed);
+
+
+        //Vector3 targetDirection = Enemy.Target.transform.position - _rb.position;
+        //Vector3 lookDirection = new Vector3(targetDirection.x, 0, targetDirection.z);
+        //Quaternion rotation = Quaternion.LookRotation(lookDirection);
+
+        //transform.rotation = Quaternion.Lerp(transform.rotation, rotation, _angularSpeed * Time.fixedDeltaTime);
     }
 
     private void Start()
@@ -52,7 +60,7 @@ public abstract class EnemyBehaviour : MonoBehaviour, IMovable
         _stateMachine = new StateMachine();
         _animator = GetComponent<Animator>();
         Enemy = GetComponent<Enemy>();
-        _rb = GetComponent<Rigidbody>();
+        //_rb = GetComponent<Rigidbody>();
 
         IdleState = new IdleState(this, _stateMachine);
         FollowState = new FollowState(this, _stateMachine);
@@ -60,6 +68,9 @@ public abstract class EnemyBehaviour : MonoBehaviour, IMovable
 
         Target = Enemy.Target;
         _stateMachine.Initialize(IdleState);
+
+        _agent.speed = _speed;
+        _agent.angularSpeed = _angularSpeed;
     }
 
     private void Update()
