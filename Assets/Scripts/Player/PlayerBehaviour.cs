@@ -28,15 +28,15 @@ public class PlayerBehaviour : MonoBehaviour, IMovable
 
     public void Move()
     {
-        float minimalValue = 0.1f;
-        float scaleMoveSpeed = _speed * Time.fixedDeltaTime;
+        //float minimalValue = 0.1f;
+        //float scaleMoveSpeed = _speed * Time.fixedDeltaTime;
 
-        if (_playerController.Direction.sqrMagnitude < minimalValue)
-        {
-            //_rb.velocity = Vector3.zero;
+        //if (_playerController.Direction.sqrMagnitude < minimalValue)
+        //{
+        //    //_rb.velocity = Vector3.zero;
 
-            return;
-        }
+        //    return;
+        //}
 
         Vector2 direction = _playerController.Direction;
 
@@ -71,10 +71,6 @@ public class PlayerBehaviour : MonoBehaviour, IMovable
             _animator.SetBool("IsRunning", true);
         else
             _animator.SetBool("IsRunning", false);
-    }
-
-    private void FixedUpdate()
-    {
     }
 
     private void InitializePool()
